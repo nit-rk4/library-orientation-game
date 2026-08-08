@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { questions } from '../data/questions'
 import type { AnswerFeedback, PlayerProfile } from '../types/game'
-import { loadLeaderboard, saveLeaderboardEntry } from '../utils/leaderboard'
+import type { LeaderboardEntry, LeaderboardLoadResult, LeaderboardLoadStatus, ScoreSubmissionStatus } from '../types/leaderboard'
+import { createLeaderboardEntry, loadLeaderboard, saveLeaderboardEntry } from '../services/leaderboardService'
 import { calculateQuestionPoints } from '../utils/scoring'
 import { GameScreen } from './GameScreen'
 import { PlayerEntryScreen } from './PlayerEntryScreen'
@@ -9,7 +10,13 @@ import { ResultScreen } from './ResultScreen'
 import { StartScreen } from './StartScreen'
 
 type Screen = 'start' | 'entry' | 'game' | 'result'
-type SubmissionStatus = 'idle' | 'saved' | 'error'
+const GAME_ID = 'knowsmore'
+
+function getLoadStatus(result: LeaderboardLoadResult): LeaderboardLoadStatus {
+  if (result.source === 'supabase') return 'synced'
+  if (!result.configured) return 'unconfigured'
+  return result.source === 'cache' ? 'cached' : 'error'
+}
 
 export function KnowsMoreGame() {
   const [screen, setScreen] = useState<Screen>('start')
@@ -20,8 +27,20 @@ export function KnowsMoreGame() {
   const [streak, setStreak] = useState(0)
   const [bestStreak, setBestStreak] = useState(0)
   const [feedback, setFeedback] = useState<AnswerFeedback | null>(null)
-  const [entries, setEntries] = useState(loadLeaderboard)
-  const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>('idle')
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([])
+  const [leaderboardStatus, setLeaderboardStatus] = useState<LeaderboardLoadStatus>('loading')
+  const [submissionStatus, setSubmissionStatus] = useState<ScoreSubmissionStatus>('idle')
+  const pendingEntry = useRef<LeaderboardEntry | null>(null)
+
+  useEffect(() => {
+    let isCurrent = true
+    void loadLeaderboard(GAME_ID).then((result) => {
+      if (!isCurrent) return
+      setEntries(result.entries)
+      setLeaderboardStatus(getLoadStatus(result))
+    })
+    return () => { isCurrent = false }
+  }, [])
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
@@ -35,6 +54,7 @@ export function KnowsMoreGame() {
     setBestStreak(0)
     setFeedback(null)
     setSubmissionStatus('idle')
+    pendingEntry.current = null
   }
 
   function beginGame(nextPlayer: PlayerProfile) {
@@ -82,10 +102,18 @@ export function KnowsMoreGame() {
     setScreen('game')
   }
 
-  function submitScore() {
-    if (!player || submissionStatus === 'saved') return
-    const result = saveLeaderboardEntry(player, { correctAnswers, arcadePoints, bestStreak })
+  async function submitScore() {
+    if (!player || submissionStatus === 'saved' || submissionStatus === 'saving') return
+    const entry = pendingEntry.current ?? createLeaderboardEntry(
+      GAME_ID,
+      player,
+      { correctAnswers, arcadePoints, bestStreak },
+    )
+    pendingEntry.current = entry
+    setSubmissionStatus('saving')
+    const result = await saveLeaderboardEntry(entry)
     setEntries(result.entries)
+    setLeaderboardStatus(getLoadStatus(result))
     setSubmissionStatus(result.saved ? 'saved' : 'error')
   }
 
@@ -113,6 +141,7 @@ export function KnowsMoreGame() {
           bestStreak={bestStreak}
           correctAnswers={correctAnswers}
           entries={entries}
+          leaderboardStatus={leaderboardStatus}
           onRetry={retryGame}
           onSubmit={submitScore}
           player={player}

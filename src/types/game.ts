@@ -30,15 +30,6 @@ export interface AnswerFeedback {
   streak: number
 }
 
-export interface LeaderboardEntry extends PlayerProfile {
-  schemaVersion: 2
-  id: string
-  correctAnswers: number
-  arcadePoints: number
-  bestStreak: number
-  timestamp: string
-}
-
 export interface GameStats {
   correctAnswers: number
   arcadePoints: number

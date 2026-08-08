@@ -3,7 +3,8 @@ import { useArcadeAudio } from '../audio/ArcadeAudioContext'
 import { ArcadeFrame, ArcadeLink, PixelBadge, PixelIcon } from '../components/ArcadeElements'
 import { Button } from '../components/Button'
 import { Leaderboard } from '../components/Leaderboard'
-import type { LeaderboardEntry, PlayerProfile } from '../types/game'
+import type { PlayerProfile } from '../types/game'
+import type { LeaderboardEntry, LeaderboardLoadStatus, ScoreSubmissionStatus } from '../types/leaderboard'
 import { formatPoints } from '../utils/format'
 
 interface ResultScreenProps {
@@ -13,12 +14,13 @@ interface ResultScreenProps {
   bestStreak: number
   totalQuestions: number
   entries: LeaderboardEntry[]
-  submissionStatus: 'idle' | 'saved' | 'error'
+  leaderboardStatus: LeaderboardLoadStatus
+  submissionStatus: ScoreSubmissionStatus
   onRetry: () => void
   onSubmit: () => void
 }
 
-export function ResultScreen({ player, correctAnswers, arcadePoints, bestStreak, totalQuestions, entries, submissionStatus, onRetry, onSubmit }: ResultScreenProps) {
+export function ResultScreen({ player, correctAnswers, arcadePoints, bestStreak, totalQuestions, entries, leaderboardStatus, submissionStatus, onRetry, onSubmit }: ResultScreenProps) {
   const passed = correctAnswers >= 7
   const integrity = Math.round((correctAnswers / totalQuestions) * 100)
   const rank = correctAnswers === 10 ? 'S' : correctAnswers === 9 ? 'A' : correctAnswers >= 7 ? 'B' : 'C'
@@ -46,11 +48,12 @@ export function ResultScreen({ player, correctAnswers, arcadePoints, bestStreak,
 
       <div className="result-actions">
         {submissionStatus === 'idle' && <Button onClick={onSubmit} sound="success">Save high score</Button>}
-        {submissionStatus === 'saved' && <div className="submission-confirmed"><PixelIcon name="coin" /> HIGH SCORE SAVED!</div>}
-        {submissionStatus === 'error' && <div className="submission-confirmed submission-confirmed--error">SAVE FAILED — LOCAL STORAGE OFFLINE <button onClick={onSubmit} type="button">TRY AGAIN</button></div>}
-        <Button onClick={onRetry} variant="secondary">Continue? Retry</Button>
+        {submissionStatus === 'saving' && <Button disabled sound={false}>Syncing score...</Button>}
+        {submissionStatus === 'saved' && <div className="submission-confirmed" role="status"><PixelIcon name="coin" /> HIGH SCORE SAVED!</div>}
+        {submissionStatus === 'error' && <div className="submission-confirmed submission-confirmed--error" role="alert">SYNC FAILED — SCORE NOT SAVED <button onClick={onSubmit} type="button">TRY AGAIN</button></div>}
+        <Button disabled={submissionStatus === 'saving'} onClick={onRetry} variant="secondary">Continue? Retry</Button>
       </div>
-      <Leaderboard entries={entries} />
+      <Leaderboard entries={entries} status={leaderboardStatus} />
       <ArcadeLink className="text-link result-home" href="#/">◀ GAME SELECT</ArcadeLink>
     </section>
   )

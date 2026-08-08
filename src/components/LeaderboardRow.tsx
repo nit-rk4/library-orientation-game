@@ -1,4 +1,4 @@
-import type { LeaderboardEntry } from '../types/game'
+import type { LeaderboardEntry } from '../types/leaderboard'
 import { formatPoints, formatTimestamp } from '../utils/format'
 
 interface LeaderboardRowProps {

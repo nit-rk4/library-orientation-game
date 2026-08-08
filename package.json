@@ -10,14 +10,15 @@
   },
   "dependencies": {
     "@fontsource/press-start-2p": "latest",
+    "@supabase/supabase-js": "^2.112.2",
     "react": "latest",
     "react-dom": "latest"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "latest",
-    "typescript": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "typescript": "latest",
     "vite": "latest"
   }
 }

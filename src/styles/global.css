@@ -397,6 +397,10 @@ select option { background: #10151e; }
 .leaderboard h2 { color: var(--gold); font-family: var(--pixel); font-size: .82rem; line-height: 1.5; margin: 0; text-shadow: 3px 3px var(--red-dark); }
 .leaderboard__live { color: var(--mint); font-family: var(--pixel); font-size: .3rem; }
 .leaderboard__live i { background: var(--mint); display: inline-block; height: 5px; width: 5px; }
+.leaderboard__live--loading, .leaderboard__live--cached, .leaderboard__live--unconfigured { color: var(--gold); }
+.leaderboard__live--loading i, .leaderboard__live--cached i, .leaderboard__live--unconfigured i { background: var(--gold); }
+.leaderboard__live--error { color: #ff9585; }
+.leaderboard__live--error i { background: var(--red); }
 .leaderboard__list { list-style: none; margin: 0; padding: 0; }
 .leaderboard-row { align-items: center; background: #0a1018; border: 2px solid #303945; display: grid; gap: 9px; grid-template-columns: 30px minmax(0,1fr) auto; min-height: 63px; padding: 8px; }
 .leaderboard-row + .leaderboard-row { margin-top: 5px; }
@@ -408,6 +412,7 @@ select option { background: #10151e; }
 .leaderboard-row__score strong { color: var(--mint); }
 .leaderboard-row__score small { color: #899496; font-size: .44rem; }
 .leaderboard__empty { background: #080e15; border: 2px dashed #4b5662; color: #a8b2b2; font-family: var(--pixel); font-size: .34rem; line-height: 1.8; padding: 17px; }
+.leaderboard__notice { color: #929c9e; font-size: .58rem; line-height: 1.6; margin: 12px 0 0; }
 .result-home { margin-top: 29px; }
 
 /* Ralph construction preview */

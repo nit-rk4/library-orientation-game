@@ -23,7 +23,7 @@ export function PlayerEntryScreen({ initialPlayer, onContinue }: PlayerEntryScre
     <section className="screen screen--entry" aria-labelledby="entry-title">
       <PixelBadge tone="gold">PLAYER REGISTRATION</PixelBadge>
       <h1 id="entry-title">Enter your<br /><em>player data</em></h1>
-      <p className="screen-copy">Create a local arcade profile for your score, streak, and program leaderboard entry.</p>
+      <p className="screen-copy">Create an arcade profile for your score, streak, and shared program leaderboard entry.</p>
       <ArcadeFrame className="registration-console" tone="blue">
         <div className="registration-console__header"><PixelIcon name="coin" /><span>PLAYER 1</span><strong>{initials.length === 3 && program ? 'READY' : 'JOINING…'}</strong></div>
         <form className="entry-form" onSubmit={submit}>
@@ -42,7 +42,7 @@ export function PlayerEntryScreen({ initialPlayer, onContinue }: PlayerEntryScre
           <Button disabled={initials.length !== 3 || !program} fullWidth sound="execute" type="submit">Player 1 ready</Button>
         </form>
       </ArcadeFrame>
-      <p className="privacy-note">LOCAL HIGH SCORES ONLY // NO ACCOUNT NEEDED</p>
+      <p className="privacy-note">SHARED HIGH SCORES // NO ACCOUNT NEEDED</p>
     </section>
   )
 }
