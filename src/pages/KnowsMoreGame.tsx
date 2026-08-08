@@ -1,43 +1,48 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { questions } from '../data/questions'
-import type { AnswerFeedback, PlayerProfile } from '../types/game'
-import type { LeaderboardEntry, LeaderboardLoadResult, LeaderboardLoadStatus, ScoreSubmissionStatus } from '../types/leaderboard'
-import { createLeaderboardEntry, loadLeaderboard, saveLeaderboardEntry } from '../services/leaderboardService'
+import { ralphQuestions } from '../data/ralphQuestions'
+import { createLeaderboardEntry, getLeaderboardLoadStatus, loadLeaderboard, saveLeaderboardEntry } from '../services/leaderboardService'
+import type { AnswerFeedback, PlayerProfile, RalphAnswerFeedback } from '../types/game'
+import type { LeaderboardEntry, LeaderboardLoadStatus, ScoreSubmissionStatus } from '../types/leaderboard'
+import { randomizeQuestionChoices } from '../utils/randomizeQuestions'
 import { calculateQuestionPoints } from '../utils/scoring'
 import { GameScreen } from './GameScreen'
+import { LevelTransitionScreen } from './LevelTransitionScreen'
 import { PlayerEntryScreen } from './PlayerEntryScreen'
+import { RalphGameScreen } from './RalphGameScreen'
 import { ResultScreen } from './ResultScreen'
-import { StartScreen } from './StartScreen'
 
-type Screen = 'start' | 'entry' | 'game' | 'result'
+type Screen = 'entry' | 'knowsmore' | 'transition' | 'ralph' | 'result'
 const GAME_ID = 'knowsmore'
 
-function getLoadStatus(result: LeaderboardLoadResult): LeaderboardLoadStatus {
-  if (result.source === 'supabase') return 'synced'
-  if (!result.configured) return 'unconfigured'
-  return result.source === 'cache' ? 'cached' : 'error'
-}
-
 export function KnowsMoreGame() {
-  const [screen, setScreen] = useState<Screen>('start')
+  const [screen, setScreen] = useState<Screen>('entry')
   const [player, setPlayer] = useState<PlayerProfile | null>(null)
+  const [runQuestions, setRunQuestions] = useState(questions)
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [correctAnswers, setCorrectAnswers] = useState(0)
-  const [arcadePoints, setArcadePoints] = useState(0)
+  const [ralphQuestion, setRalphQuestion] = useState(0)
+  const [knowsMoreCorrect, setKnowsMoreCorrect] = useState(0)
+  const [knowsMorePoints, setKnowsMorePoints] = useState(0)
+  const [ralphCorrect, setRalphCorrect] = useState(0)
+  const [ralphPoints, setRalphPoints] = useState(0)
   const [streak, setStreak] = useState(0)
   const [bestStreak, setBestStreak] = useState(0)
-  const [feedback, setFeedback] = useState<AnswerFeedback | null>(null)
+  const [knowsMoreFeedback, setKnowsMoreFeedback] = useState<AnswerFeedback | null>(null)
+  const [ralphFeedback, setRalphFeedback] = useState<RalphAnswerFeedback | null>(null)
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [leaderboardStatus, setLeaderboardStatus] = useState<LeaderboardLoadStatus>('loading')
   const [submissionStatus, setSubmissionStatus] = useState<ScoreSubmissionStatus>('idle')
   const pendingEntry = useRef<LeaderboardEntry | null>(null)
+
+  const runCorrectAnswers = knowsMoreCorrect + ralphCorrect
+  const runPoints = knowsMorePoints + ralphPoints
 
   useEffect(() => {
     let isCurrent = true
     void loadLeaderboard(GAME_ID).then((result) => {
       if (!isCurrent) return
       setEntries(result.entries)
-      setLeaderboardStatus(getLoadStatus(result))
+      setLeaderboardStatus(getLeaderboardLoadStatus(result))
     })
     return () => { isCurrent = false }
   }, [])
@@ -47,36 +52,41 @@ export function KnowsMoreGame() {
   }, [screen])
 
   function resetRun() {
+    setRunQuestions(randomizeQuestionChoices(questions))
     setCurrentQuestion(0)
-    setCorrectAnswers(0)
-    setArcadePoints(0)
+    setRalphQuestion(0)
+    setKnowsMoreCorrect(0)
+    setKnowsMorePoints(0)
+    setRalphCorrect(0)
+    setRalphPoints(0)
     setStreak(0)
     setBestStreak(0)
-    setFeedback(null)
+    setKnowsMoreFeedback(null)
+    setRalphFeedback(null)
     setSubmissionStatus('idle')
     pendingEntry.current = null
   }
 
-  function beginGame(nextPlayer: PlayerProfile) {
+  function beginRun(nextPlayer: PlayerProfile) {
     setPlayer(nextPlayer)
     resetRun()
-    setScreen('game')
+    setScreen('knowsmore')
   }
 
-  function handleAnswer(answer: string | null, timedOut: boolean, timeRemaining: number) {
-    if (feedback) return
-    const question = questions[currentQuestion]
+  function handleKnowsMoreAnswer(answer: string | null, timedOut: boolean, timeRemaining: number) {
+    if (knowsMoreFeedback) return
+    const question = runQuestions[currentQuestion]
     const isCorrect = answer === question.restoredTerm
     const nextStreak = isCorrect ? streak + 1 : 0
     const pointsAwarded = isCorrect ? calculateQuestionPoints(timeRemaining, nextStreak) : 0
 
     if (isCorrect) {
-      setCorrectAnswers((current) => current + 1)
-      setArcadePoints((current) => current + pointsAwarded)
+      setKnowsMoreCorrect((current) => current + 1)
+      setKnowsMorePoints((current) => current + pointsAwarded)
       setBestStreak((current) => Math.max(current, nextStreak))
     }
     setStreak(nextStreak)
-    setFeedback({
+    setKnowsMoreFeedback({
       selectedTerm: answer,
       resolvedTerm: question.restoredTerm,
       isCorrect,
@@ -87,19 +97,57 @@ export function KnowsMoreGame() {
     })
   }
 
-  function advanceQuestion() {
-    if (currentQuestion === questions.length - 1) {
+  function advanceKnowsMore() {
+    if (currentQuestion === runQuestions.length - 1) {
+      setScreen('transition')
+      return
+    }
+    setCurrentQuestion((current) => current + 1)
+    setKnowsMoreFeedback(null)
+  }
+
+  const startRalph = useCallback(() => {
+    setRalphQuestion(0)
+    setRalphFeedback(null)
+    setScreen('ralph')
+  }, [])
+
+  function handleRalphAnswer(answer: boolean | null, timedOut: boolean, timeRemaining: number) {
+    if (ralphFeedback) return
+    const question = ralphQuestions[ralphQuestion]
+    const isCorrect = answer === question.isTrue
+    const nextStreak = isCorrect ? streak + 1 : 0
+    const pointsAwarded = isCorrect ? calculateQuestionPoints(timeRemaining, nextStreak) : 0
+
+    if (isCorrect) {
+      setRalphCorrect((current) => current + 1)
+      setRalphPoints((current) => current + pointsAwarded)
+      setBestStreak((current) => Math.max(current, nextStreak))
+    }
+    setStreak(nextStreak)
+    setRalphFeedback({
+      selectedAnswer: answer,
+      correctAnswer: question.isTrue,
+      isCorrect,
+      timedOut,
+      timeRemaining,
+      pointsAwarded,
+      streak: nextStreak,
+    })
+  }
+
+  function advanceRalph() {
+    if (ralphQuestion === ralphQuestions.length - 1) {
       setScreen('result')
       return
     }
-
-    setCurrentQuestion((current) => current + 1)
-    setFeedback(null)
+    setRalphQuestion((current) => current + 1)
+    setRalphFeedback(null)
   }
 
-  function retryGame() {
+  function retryRun() {
     resetRun()
-    setScreen('game')
+    setScreen('knowsmore')
   }
 
   async function submitScore() {
@@ -107,46 +155,64 @@ export function KnowsMoreGame() {
     const entry = pendingEntry.current ?? createLeaderboardEntry(
       GAME_ID,
       player,
-      { correctAnswers, arcadePoints, bestStreak },
+      { correctAnswers: runCorrectAnswers, arcadePoints: runPoints, bestStreak },
     )
     pendingEntry.current = entry
     setSubmissionStatus('saving')
     const result = await saveLeaderboardEntry(entry)
     setEntries(result.entries)
-    setLeaderboardStatus(getLoadStatus(result))
+    setLeaderboardStatus(getLeaderboardLoadStatus(result))
     setSubmissionStatus(result.saved ? 'saved' : 'error')
   }
 
   return (
     <div className="knowsmore-module">
-      {screen === 'start' && <StartScreen onStart={() => setScreen('entry')} />}
-      {screen === 'entry' && <PlayerEntryScreen initialPlayer={player} onContinue={beginGame} />}
-      {screen === 'game' && (
+      {screen === 'entry' && <PlayerEntryScreen initialPlayer={player} onContinue={beginRun} />}
+      {screen === 'knowsmore' && (
         <GameScreen
-          arcadePoints={arcadePoints}
-          correctAnswers={correctAnswers}
-          feedback={feedback}
-          key={questions[currentQuestion].id}
-          onAdvance={advanceQuestion}
-          onAnswer={handleAnswer}
-          question={questions[currentQuestion]}
+          arcadePoints={knowsMorePoints}
+          correctAnswers={knowsMoreCorrect}
+          feedback={knowsMoreFeedback}
+          key={runQuestions[currentQuestion].id}
+          onAdvance={advanceKnowsMore}
+          onAnswer={handleKnowsMoreAnswer}
+          question={runQuestions[currentQuestion]}
           questionNumber={currentQuestion + 1}
           streak={streak}
-          totalQuestions={questions.length}
+          totalQuestions={runQuestions.length}
+        />
+      )}
+      {screen === 'transition' && (
+        <LevelTransitionScreen bestStreak={bestStreak} correctAnswers={knowsMoreCorrect} onContinue={startRalph} points={knowsMorePoints} />
+      )}
+      {screen === 'ralph' && (
+        <RalphGameScreen
+          feedback={ralphFeedback}
+          key={ralphQuestions[ralphQuestion].id}
+          levelCorrectAnswers={ralphCorrect}
+          onAdvance={advanceRalph}
+          onAnswer={handleRalphAnswer}
+          question={ralphQuestions[ralphQuestion]}
+          questionNumber={ralphQuestion + 1}
+          runCorrectAnswers={runCorrectAnswers}
+          runPoints={runPoints}
+          streak={streak}
+          totalQuestions={ralphQuestions.length}
         />
       )}
       {screen === 'result' && player && (
         <ResultScreen
-          arcadePoints={arcadePoints}
           bestStreak={bestStreak}
-          correctAnswers={correctAnswers}
           entries={entries}
+          knowsMoreCorrect={knowsMoreCorrect}
+          knowsMorePoints={knowsMorePoints}
           leaderboardStatus={leaderboardStatus}
-          onRetry={retryGame}
+          onRetry={retryRun}
           onSubmit={submitScore}
           player={player}
+          ralphCorrect={ralphCorrect}
+          ralphPoints={ralphPoints}
           submissionStatus={submissionStatus}
-          totalQuestions={questions.length}
         />
       )}
     </div>

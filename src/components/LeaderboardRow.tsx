@@ -7,6 +7,8 @@ interface LeaderboardRowProps {
 }
 
 export function LeaderboardRow({ entry, rank }: LeaderboardRowProps) {
+  const totalQuestions = entry.version >= 4 ? 20 : 10
+
   return (
     <li className="leaderboard-row">
       <span className="leaderboard-row__rank">{String(rank).padStart(2, '0')}</span>
@@ -15,7 +17,7 @@ export function LeaderboardRow({ entry, rank }: LeaderboardRowProps) {
         <span>{entry.program}</span>
       </div>
       <div className="leaderboard-row__score">
-        <strong>{entry.correctAnswers}<small>/10</small></strong>
+        <strong>{entry.correctAnswers}<small>/{totalQuestions}</small></strong>
         <span>{formatPoints(entry.arcadePoints)} PTS · {formatTimestamp(entry.timestamp)}</span>
       </div>
     </li>

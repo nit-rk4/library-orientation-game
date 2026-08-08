@@ -2,67 +2,66 @@
 
 ## Product principle
 
-Library Game Central is the freshmen’s first interactive impression of the
-library at a college with strong Computer Science, Information Technology,
-Multimedia Arts, and Engineering communities alongside other programs.
+Library Game Central is an individual-player, two-level arcade run for college
+freshmen. It is a student’s first interactive impression of a technology-forward
+campus library—not a worksheet, children’s spelling game, or generic quiz with
+an arcade background.
 
-The interface should meet that audience at a college level. It must feel like a
-purpose-built digital system—not a worksheet, a children’s spelling game, or a
-generic multiple-choice quiz with an arcade background.
+One `PRESS START` action registers one player. KnowsMore always plays first,
+Ralph follows automatically, and one combined result is posted to one
+leaderboard.
 
 ## Canonical visual direction
 
-The product is an original retro-arcade/search-engine hybrid. It borrows the
-energy and material language of a well-loved cabinet—chunky construction,
-bright score counters, hard pixel shadows, brickwork, gold trim, and tactile
-controls—then applies those ideas to a fictional library database-restoration
-system. The goal is arcade excitement without copying licensed characters,
-logos, cabinet art, or other copyrighted imagery.
+The product is an original retro-arcade/search-engine hybrid. It uses chunky
+cabinet construction, bright score counters, hard pixel shadows, brickwork,
+gold trim, tactile controls, and a fictional library system-restoration story.
+It does not copy licensed characters, logos, cabinet art, or other protected
+imagery.
 
-KnowsMore should feel like a game built for a technology-forward campus. Its
-search field, indexed results, system feedback, score economy, and integrity
-meter are part of the play, not decorative chrome around a multiple-choice
-quiz. Pixel typography is reserved for short labels, scores, and headlines;
-clues and explanations use a readable monospace face.
+Both levels must feel like parts of the same system. KnowsMore’s search console
+and indexed results flow into Ralph’s integrity feed and physical-feeling
+`SAVE IT` / `SMASH IT` controls. The score economy, HUD, timing, feedback, and
+combo are shared parts of play—not decorative chrome around a quiz.
 
-Visual and interaction sophistication must not become unfair difficulty. A new
-student should be able to reason from the context even when a library term is
-unfamiliar. Success should feel earned; mistakes should teach without making a
-player feel unintelligent.
+Pixel typography is reserved for short labels, scores, and headlines. Clues,
+statements, and explanations use a readable monospace face. Visual
+sophistication must not create unfair difficulty.
 
 ## Experience rules
 
+- Support one individual student only; never introduce teams or group mode.
+- Keep one start flow and one combined leaderboard.
 - Make players operate a themed system rather than merely answer questions.
-- Use concise technical English for controls and light Taglish for welcoming
-  instructions and feedback.
+- Use concise technical English and occasional light Taglish for feedback.
 - Introduce familiar concepts before applied research and discovery terms.
-- Use plausible options, contextual clues, and explanations; never use trick
-  questions or obscure library-science jargon.
-- Keep text readable on a phone and complete a run in approximately 3–5 minutes.
+- Use fair prompts, contextual clues, and useful explanations; avoid tricks.
+- Keep the full 20-round run readable on phones and completable in 6–10 minutes.
 - Use crisp pixel motion, cabinet feedback, and restrained glitch effects.
-  Avoid childish mascots, excessive celebration effects, and licensed
-  character artwork.
-- Start synthesized cabinet audio muted, remember the player’s preference, and
-  never make sound necessary for play.
-- Respect keyboard access, focus visibility, color contrast, and reduced-motion
-  preferences.
+- Start synthesized audio muted, remember the preference, and never require it.
+- Respect keyboard access, focus visibility, contrast, and reduced motion.
 
-## Module roadmap
+## Canonical run structure
 
-### Module 01: KnowsMore’s Missing Word
+### Level 1 — KnowsMore’s Missing Word
 
-Status: playable. A solo search-system restoration game covering library basics,
+Status: playable. Ten search-system restoration rounds cover library basics,
 e-books, borrowing, call numbers, OPAC, librarians, reference service,
-databases, keywords, and citations.
+databases, keywords, and citations. Choices reshuffle for every run.
 
-### Module 02: Ralph’s True-or-False Smash
+### Level 2 — Ralph’s True-or-False Smash
 
-Status: preview only. The planned group game will ask players to choose `SAVE IT`
-for verified information and `SMASH IT` for false library information. Do not
-add Ralph questions or gameplay until that module is explicitly commissioned.
+Status: playable. Ten integrity signals cover library services, borrowing,
+OPAC, e-books, databases, librarian help, responsible behavior, research
+support, book care, and account security. Players choose `SAVE IT` for verified
+information and `SMASH IT` for false information.
 
-### Future landing experience
+Both levels use accuracy, remaining-time, and streak scoring. The streak and
+score carry through the automatic level handoff. The final screen reports each
+level’s accuracy and points plus the combined total.
 
-The current Library Game Central portal is intentionally small. It should grow
-through the module registry and shared shell instead of coupling the individual
-game state machines together.
+## Landing experience
+
+The portal stays concise: one `PRESS START`, one `LEADERBOARD`, and a compact
+two-level run map. Level previews communicate the journey but are not separate
+game-selection actions.

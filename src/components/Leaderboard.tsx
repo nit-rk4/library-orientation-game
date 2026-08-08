@@ -23,7 +23,7 @@ export function Leaderboard({ entries, status }: LeaderboardProps) {
     <section className="leaderboard" aria-labelledby="leaderboard-title">
       <div className="leaderboard__heading">
         <div>
-          <p className="eyebrow">CAMPUS ARCADE</p>
+          <p className="eyebrow">FULL-RUN ARCADE</p>
           <h2 id="leaderboard-title">High Scores</h2>
         </div>
         <span className={`leaderboard__live leaderboard__live--${status}`} aria-live="polite"><i /> {statusCopy[status]}</span>

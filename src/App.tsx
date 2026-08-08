@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { AppShell } from './components/AppShell'
 import { KnowsMoreGame } from './pages/KnowsMoreGame'
 import { LandingPage } from './pages/LandingPage'
-import { RalphPreviewPage } from './pages/RalphPreviewPage'
+import { LeaderboardPage } from './pages/LeaderboardPage'
 
 function getHashRoute() {
   return window.location.hash.slice(1) || '/'
@@ -17,10 +17,10 @@ function App() {
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
-  const page = route === '/knowsmore'
+  const page = route === '/knowsmore' || route === '/ralph'
     ? <KnowsMoreGame />
-    : route === '/ralph'
-      ? <RalphPreviewPage />
+    : route === '/leaderboard'
+      ? <LeaderboardPage />
       : <LandingPage />
 
   return <AppShell route={route}>{page}</AppShell>

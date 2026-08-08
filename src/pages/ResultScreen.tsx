@@ -9,10 +9,11 @@ import { formatPoints } from '../utils/format'
 
 interface ResultScreenProps {
   player: PlayerProfile
-  correctAnswers: number
-  arcadePoints: number
+  knowsMoreCorrect: number
+  knowsMorePoints: number
+  ralphCorrect: number
+  ralphPoints: number
   bestStreak: number
-  totalQuestions: number
   entries: LeaderboardEntry[]
   leaderboardStatus: LeaderboardLoadStatus
   submissionStatus: ScoreSubmissionStatus
@@ -20,41 +21,45 @@ interface ResultScreenProps {
   onSubmit: () => void
 }
 
-export function ResultScreen({ player, correctAnswers, arcadePoints, bestStreak, totalQuestions, entries, leaderboardStatus, submissionStatus, onRetry, onSubmit }: ResultScreenProps) {
-  const passed = correctAnswers >= 7
-  const integrity = Math.round((correctAnswers / totalQuestions) * 100)
-  const rank = correctAnswers === 10 ? 'S' : correctAnswers === 9 ? 'A' : correctAnswers >= 7 ? 'B' : 'C'
+export function ResultScreen({ player, knowsMoreCorrect, knowsMorePoints, ralphCorrect, ralphPoints, bestStreak, entries, leaderboardStatus, submissionStatus, onRetry, onSubmit }: ResultScreenProps) {
+  const correctAnswers = knowsMoreCorrect + ralphCorrect
+  const arcadePoints = knowsMorePoints + ralphPoints
+  const passed = correctAnswers >= 14
+  const integrity = Math.round((correctAnswers / 20) * 100)
+  const rank = correctAnswers === 20 ? 'S' : correctAnswers >= 18 ? 'A' : correctAnswers >= 14 ? 'B' : 'C'
   const { play } = useArcadeAudio()
 
   useEffect(() => { play(passed ? 'win' : 'error') }, [passed, play])
 
   return (
     <section className={`screen screen--result${passed ? ' is-victory' : ' is-defeat'}`} aria-labelledby="result-title">
-      <PixelBadge tone={passed ? 'gold' : 'red'}>{passed ? 'STAGE CLEAR!' : 'CONTINUE?'}</PixelBadge>
-      <p className="eyebrow">FINAL SCORE // PLAYER {player.initials}</p>
-      <h1 id="result-title">{passed ? <>Library power<br /><em>restored!</em></> : <>Database needs<br /><em>another run</em></>}</h1>
-      <p className="screen-copy">{passed ? 'Core records restored! Handa ka nang mag-search like a college researcher.' : 'May corrupted words pa. Review the clues, then try another run.'}</p>
+      <PixelBadge tone={passed ? 'gold' : 'red'}>{passed ? 'TWO-LEVEL RUN CLEAR!' : 'RUN COMPLETE'}</PixelBadge>
+      <p className="eyebrow">FINAL RUN // PLAYER {player.initials}</p>
+      <h1 id="result-title">{passed ? <>Library systems<br /><em>fully restored!</em></> : <>Training data<br /><em>needs another run</em></>}</h1>
+      <p className="screen-copy">{passed ? 'KnowsMore restored the search system and Ralph cleared the integrity feed. Full arcade run complete.' : 'Both levels are complete. Review the system feedback, then return for a stronger combined score.'}</p>
 
-      <ArcadeFrame className="result-dashboard" tone={passed ? 'gold' : 'red'}>
-        <div className="result-grade"><span>RANK</span><strong>{rank}</strong><PixelIcon name={passed ? 'spark' : 'brick'} /></div>
+      <ArcadeFrame className="result-dashboard result-dashboard--run" tone={passed ? 'gold' : 'red'}>
+        <div className="result-grade"><span>RUN RANK</span><strong>{rank}</strong><PixelIcon name={passed ? 'spark' : 'brick'} /></div>
         <div className="result-dashboard__primary">
-          <span>WORDS RESTORED</span>
-          <strong>{String(correctAnswers).padStart(2, '0')}<small>/{String(totalQuestions).padStart(2, '0')}</small></strong>
-          <p>LIBRARY POWER {integrity}% // 70% TO CLEAR</p>
+          <span>COMBINED ACCURACY</span>
+          <strong>{String(correctAnswers).padStart(2, '0')}<small>/20</small></strong>
+          <p>LIBRARY POWER {integrity}% // TWO LEVELS COMPLETE</p>
         </div>
-        <div className="result-dashboard__stat"><span>FINAL SCORE</span><strong>{formatPoints(arcadePoints)}</strong></div>
+        <div className="result-dashboard__stat"><span>KNOWSMORE</span><strong>{formatPoints(knowsMorePoints)}</strong><small>{knowsMoreCorrect}/10 CORRECT</small></div>
+        <div className="result-dashboard__stat"><span>RALPH</span><strong>{formatPoints(ralphPoints)}</strong><small>{ralphCorrect}/10 CORRECT</small></div>
+        <div className="result-dashboard__stat"><span>COMBINED SCORE</span><strong>{formatPoints(arcadePoints)}</strong></div>
         <div className="result-dashboard__stat"><span>BEST COMBO</span><strong>×{bestStreak}</strong></div>
       </ArcadeFrame>
 
       <div className="result-actions">
-        {submissionStatus === 'idle' && <Button onClick={onSubmit} sound="success">Save high score</Button>}
+        {submissionStatus === 'idle' && <Button onClick={onSubmit} sound="success">Save full-run score</Button>}
         {submissionStatus === 'saving' && <Button disabled sound={false}>Syncing score...</Button>}
-        {submissionStatus === 'saved' && <div className="submission-confirmed" role="status"><PixelIcon name="coin" /> HIGH SCORE SAVED!</div>}
+        {submissionStatus === 'saved' && <div className="submission-confirmed" role="status"><PixelIcon name="coin" /> COMBINED SCORE SAVED!</div>}
         {submissionStatus === 'error' && <div className="submission-confirmed submission-confirmed--error" role="alert">SYNC FAILED — SCORE NOT SAVED <button onClick={onSubmit} type="button">TRY AGAIN</button></div>}
-        <Button disabled={submissionStatus === 'saving'} onClick={onRetry} variant="secondary">Continue? Retry</Button>
+        <Button disabled={submissionStatus === 'saving'} onClick={onRetry} variant="secondary">Retry full run</Button>
       </div>
       <Leaderboard entries={entries} status={leaderboardStatus} />
-      <ArcadeLink className="text-link result-home" href="#/">◀ GAME SELECT</ArcadeLink>
+      <ArcadeLink className="text-link result-home" href="#/">◀ ARCADE HOME</ArcadeLink>
     </section>
   )
 }

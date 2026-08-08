@@ -75,7 +75,7 @@ export function GameScreen({
     <section className="screen screen--game" aria-label={`Query ${questionNumber} of ${totalQuestions}`}>
       <div className="game-status">
         <div className="progress-block">
-          <div className="progress-block__labels"><PixelBadge tone="gold">ROUND {String(questionNumber).padStart(2, '0')}</PixelBadge><span>STAGE {questionNumber} / {totalQuestions}</span></div>
+          <div className="progress-block__labels"><PixelBadge tone="gold">LEVEL 01 // ROUND {String(questionNumber).padStart(2, '0')}</PixelBadge><span>KNOWSMORE {questionNumber} / {totalQuestions}</span></div>
           <div className="progress-track"><span style={{ width: `${queryProgress}%` }} /></div>
         </div>
         <ScoreDisplay arcadePoints={arcadePoints} correctAnswers={correctAnswers} streak={streak} total={totalQuestions} />

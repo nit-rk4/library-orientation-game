@@ -49,9 +49,9 @@ export function normalizeLeaderboardEntry(
   if (initials.length !== 3 || !program || !timestamp || !gameId) return null
 
   const legacyScore = numericValue(record.score)
-  const correctAnswers = Math.min(10, numericValue(readAlias(record, 'correctAnswers', 'correct_answers'), legacyScore))
+  const correctAnswers = Math.min(20, numericValue(readAlias(record, 'correctAnswers', 'correct_answers'), legacyScore))
   const arcadePoints = Math.min(100_000, numericValue(readAlias(record, 'arcadePoints', 'arcade_points'), correctAnswers * 1000))
-  const bestStreak = Math.min(10, numericValue(readAlias(record, 'bestStreak', 'best_streak')))
+  const bestStreak = Math.min(20, numericValue(readAlias(record, 'bestStreak', 'best_streak')))
   const version = Math.max(1, numericValue(readAlias(record, 'version', 'schemaVersion'), legacyScore ? 1 : CURRENT_LEADERBOARD_VERSION))
   const rawId = stringValue(record.id)
   const id = rawId || `legacy-${gameId}-${index}-${timestamp}`

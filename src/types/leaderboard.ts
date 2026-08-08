@@ -1,6 +1,6 @@
 import type { GameStats, PlayerProfile } from './game'
 
-export const CURRENT_LEADERBOARD_VERSION = 3
+export const CURRENT_LEADERBOARD_VERSION = 4
 
 export interface LeaderboardEntry extends PlayerProfile, GameStats {
   id: string

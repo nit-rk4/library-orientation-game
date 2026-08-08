@@ -9,6 +9,7 @@ interface AppShellProps {
 
 export function AppShell({ route, children }: AppShellProps) {
   const isPortal = route === '/'
+  const systemStatus = isPortal ? 'FULL RUN READY' : route === '/leaderboard' ? 'SCORE ARCHIVE' : 'PLAYER 1'
   const { enabled: soundEnabled, play, toggle } = useArcadeAudio()
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export function AppShell({ route, children }: AppShellProps) {
           <span>LIBRARY<em>ARCADE</em><small>GAME CENTRAL</small></span>
         </a>
         <div className="system-header__controls">
-          <div className="system-header__status"><span className="pixel-led" /> {isPortal ? 'SELECT GAME' : 'PLAYER 1'}</div>
+          <div className="system-header__status"><span className="pixel-led" /> {systemStatus}</div>
           <button aria-label={soundEnabled ? 'Mute arcade sound' : 'Enable arcade sound'} aria-pressed={soundEnabled} className="sound-toggle" onClick={toggle} type="button">
             <span aria-hidden="true">{soundEnabled ? '♪' : '×'}</span> SOUND {soundEnabled ? 'ON' : 'OFF'}
           </button>
@@ -41,7 +42,7 @@ export function AppShell({ route, children }: AppShellProps) {
       <footer className="system-footer">
         <span className="coin-slot"><PixelIcon name="coin" /> INSERT KNOWLEDGE</span>
         <span className="speaker-grille" aria-hidden="true"><i /><i /><i /><i /><i /></span>
-        <span>LIBRARY GAME CENTRAL // v2.1</span>
+        <span>LIBRARY GAME CENTRAL // v3.0</span>
       </footer>
     </main>
   )

@@ -36,4 +36,22 @@ export interface GameStats {
   bestStreak: number
 }
 
+export interface RalphQuestion {
+  id: string
+  statement: string
+  isTrue: boolean
+  explanation: string
+  topic: string
+}
+
+export interface RalphAnswerFeedback {
+  selectedAnswer: boolean | null
+  correctAnswer: boolean
+  isCorrect: boolean
+  timedOut: boolean
+  timeRemaining: number
+  pointsAwarded: number
+  streak: number
+}
+
 export type QuestionPhase = 'scanning' | 'active' | 'resolving' | 'feedback'

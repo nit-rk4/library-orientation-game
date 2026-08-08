@@ -23,7 +23,7 @@ export function PlayerEntryScreen({ initialPlayer, onContinue }: PlayerEntryScre
     <section className="screen screen--entry" aria-labelledby="entry-title">
       <PixelBadge tone="gold">PLAYER REGISTRATION</PixelBadge>
       <h1 id="entry-title">Enter your<br /><em>player data</em></h1>
-      <p className="screen-copy">Create an arcade profile for your score, streak, and shared program leaderboard entry.</p>
+      <p className="screen-copy">Set your individual arcade profile once, then take on KnowsMore and Ralph in one continuous run.</p>
       <ArcadeFrame className="registration-console" tone="blue">
         <div className="registration-console__header"><PixelIcon name="coin" /><span>PLAYER 1</span><strong>{initials.length === 3 && program ? 'READY' : 'JOINING…'}</strong></div>
         <form className="entry-form" onSubmit={submit}>
@@ -39,7 +39,7 @@ export function PlayerEntryScreen({ initialPlayer, onContinue }: PlayerEntryScre
               {programs.map((item) => <option key={item} value={item}>{item}</option>)}
             </select>
           </label>
-          <Button disabled={initials.length !== 3 || !program} fullWidth sound="execute" type="submit">Player 1 ready</Button>
+          <Button disabled={initials.length !== 3 || !program} fullWidth sound="execute" type="submit">Begin Level 1</Button>
         </form>
       </ArcadeFrame>
       <p className="privacy-note">SHARED HIGH SCORES // NO ACCOUNT NEEDED</p>

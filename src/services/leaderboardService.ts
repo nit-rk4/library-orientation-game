@@ -1,6 +1,6 @@
 import { supabase, supabaseConfigurationError } from '../lib/supabase'
 import type { GameStats, PlayerProfile } from '../types/game'
-import type { LeaderboardEntry, LeaderboardLoadResult, LeaderboardSaveResult } from '../types/leaderboard'
+import type { LeaderboardEntry, LeaderboardLoadResult, LeaderboardLoadStatus, LeaderboardSaveResult } from '../types/leaderboard'
 import { CURRENT_LEADERBOARD_VERSION } from '../types/leaderboard'
 import {
   normalizeLeaderboardEntries,
@@ -9,8 +9,14 @@ import {
   writeLeaderboardCache,
 } from '../utils/leaderboard'
 
-const TABLE_NAME = 'leaderboard_scores'
+const TABLE_NAME = 'leaderboard'
 const LEADERBOARD_LIMIT = 100
+
+export function getLeaderboardLoadStatus(result: LeaderboardLoadResult): LeaderboardLoadStatus {
+  if (result.source === 'supabase') return 'synced'
+  if (!result.configured) return 'unconfigured'
+  return result.source === 'cache' ? 'cached' : 'error'
+}
 
 function createUuid() {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID()
