@@ -12,7 +12,10 @@ export function LandingPage() {
         <div className="portal__sprites" aria-hidden="true">
           <PixelIcon name="book" /><PixelIcon name="search" /><PixelIcon name="brick" />
         </div>
-        <h1 id="portal-title"><span>LIBRARY</span><em>.EXE</em></h1>
+        <div className="portal__title-row">
+          <h1 id="portal-title"><span>LIBRARY</span><em>.EXE</em></h1>
+          <span aria-hidden="true" className="portal__cursor" />
+        </div>
         <p className="portal__subtitle">FRESHMAN MODE: <strong>ACTIVATED</strong></p>
         <p className="hero-copy">A freshman arcade challenge for the campus library. Press START to enter the Library.</p>
         <p className="portal__mission"><span className="pixel-led" /> ONE PLAYER. TWO LEVELS. RESTORE THE LIBRARY SYSTEM.</p>
