@@ -13,14 +13,14 @@ levels.
 ### Level 1 — KnowsMore
 
 KnowsMore asks the player to restore ten corrupted library records through an
-autocomplete search console. Choices are reshuffled for every run. Each query
-has a 15-second active window.
+autocomplete search console. Question order and answer choices are reshuffled
+for every run. Each query has a 15-second active window.
 
 ### Level 2 — Ralph
 
 Ralph loads automatically after KnowsMore. It presents ten useful library
-orientation statements. The player uses `SAVE IT` for verified information and
-`SMASH IT` for false information.
+orientation statements in a freshly shuffled order. The player uses `SAVE IT`
+for verified information and `SMASH IT` for false information.
 
 Both levels award 1,000 points for a correct answer, 25 points per remaining
 second, and an escalating streak bonus capped at 400 points per question. The

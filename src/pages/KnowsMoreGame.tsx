@@ -4,7 +4,7 @@ import { ralphQuestions } from '../data/ralphQuestions'
 import { createLeaderboardEntry, getLeaderboardLoadStatus, loadLeaderboard, saveLeaderboardEntry } from '../services/leaderboardService'
 import type { AnswerFeedback, PlayerProfile, RalphAnswerFeedback } from '../types/game'
 import type { LeaderboardEntry, LeaderboardLoadStatus, ScoreSubmissionStatus } from '../types/leaderboard'
-import { randomizeQuestionChoices } from '../utils/randomizeQuestions'
+import { randomizeKnowsMoreQuestions, randomizeQuestionOrder } from '../utils/randomizeQuestions'
 import { calculateQuestionPoints } from '../utils/scoring'
 import { GameScreen } from './GameScreen'
 import { LevelTransitionScreen } from './LevelTransitionScreen'
@@ -20,6 +20,7 @@ export function KnowsMoreGame() {
   const [player, setPlayer] = useState<PlayerProfile | null>(null)
   const [runQuestions, setRunQuestions] = useState(questions)
   const [currentQuestion, setCurrentQuestion] = useState(0)
+  const [runRalphQuestions, setRunRalphQuestions] = useState(ralphQuestions)
   const [ralphQuestion, setRalphQuestion] = useState(0)
   const [knowsMoreCorrect, setKnowsMoreCorrect] = useState(0)
   const [knowsMorePoints, setKnowsMorePoints] = useState(0)
@@ -52,7 +53,8 @@ export function KnowsMoreGame() {
   }, [screen])
 
   function resetRun() {
-    setRunQuestions(randomizeQuestionChoices(questions))
+    setRunQuestions((current) => randomizeKnowsMoreQuestions(questions, current))
+    setRunRalphQuestions((current) => randomizeQuestionOrder(ralphQuestions, current))
     setCurrentQuestion(0)
     setRalphQuestion(0)
     setKnowsMoreCorrect(0)
@@ -114,7 +116,7 @@ export function KnowsMoreGame() {
 
   function handleRalphAnswer(answer: boolean | null, timedOut: boolean, timeRemaining: number) {
     if (ralphFeedback) return
-    const question = ralphQuestions[ralphQuestion]
+    const question = runRalphQuestions[ralphQuestion]
     const isCorrect = answer === question.isTrue
     const nextStreak = isCorrect ? streak + 1 : 0
     const pointsAwarded = isCorrect ? calculateQuestionPoints(timeRemaining, nextStreak) : 0
@@ -137,7 +139,7 @@ export function KnowsMoreGame() {
   }
 
   function advanceRalph() {
-    if (ralphQuestion === ralphQuestions.length - 1) {
+    if (ralphQuestion === runRalphQuestions.length - 1) {
       setScreen('result')
       return
     }
@@ -188,16 +190,16 @@ export function KnowsMoreGame() {
       {screen === 'ralph' && (
         <RalphGameScreen
           feedback={ralphFeedback}
-          key={ralphQuestions[ralphQuestion].id}
+          key={runRalphQuestions[ralphQuestion].id}
           levelCorrectAnswers={ralphCorrect}
           onAdvance={advanceRalph}
           onAnswer={handleRalphAnswer}
-          question={ralphQuestions[ralphQuestion]}
+          question={runRalphQuestions[ralphQuestion]}
           questionNumber={ralphQuestion + 1}
           runCorrectAnswers={runCorrectAnswers}
           runPoints={runPoints}
           streak={streak}
-          totalQuestions={ralphQuestions.length}
+          totalQuestions={runRalphQuestions.length}
         />
       )}
       {screen === 'result' && player && (
