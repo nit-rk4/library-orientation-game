@@ -5,9 +5,10 @@ interface TimerProps {
   paused: boolean
   onExpire: () => void
   onTimeChange: (timeLeft: number) => void
+  label?: string
 }
 
-export function Timer({ duration, paused, onExpire, onTimeChange }: TimerProps) {
+export function Timer({ duration, paused, onExpire, onTimeChange, label = 'TIME ENERGY' }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(duration)
   const hasExpired = useRef(false)
 
@@ -29,7 +30,7 @@ export function Timer({ duration, paused, onExpire, onTimeChange }: TimerProps) 
   return (
     <div className={`timer${timeLeft <= 5 ? ' timer--critical' : ''}`} aria-label={`${timeLeft} seconds remaining`}>
       <div className="timer__readout">
-        <span className="timer__label">TIME ENERGY {paused && timeLeft > 0 ? '// HOLD' : ''}</span>
+        <span className="timer__label">{label} {paused && timeLeft > 0 ? '// HOLD' : ''}</span>
         <strong>{String(timeLeft).padStart(2, '0')}<small> SEC</small></strong>
       </div>
       <div className="timer__segments" aria-hidden="true">

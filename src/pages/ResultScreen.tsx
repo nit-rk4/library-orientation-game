@@ -33,9 +33,9 @@ export function ResultScreen({ player, knowsMoreCorrect, knowsMorePoints, ralphC
 
   return (
     <section className={`screen screen--result${passed ? ' is-victory' : ' is-defeat'}`} aria-labelledby="result-title">
-      <PixelBadge tone={passed ? 'gold' : 'red'}>{passed ? 'TWO-LEVEL RUN CLEAR!' : 'RUN COMPLETE'}</PixelBadge>
+      <PixelBadge tone={passed ? 'gold' : 'red'}>{passed ? 'LIBRARY CORE RESTORED!' : 'RUN COMPLETE'}</PixelBadge>
       <p className="eyebrow">FINAL RUN // PLAYER {player.initials}</p>
-      <h1 id="result-title">{passed ? <>Library systems<br /><em>fully restored!</em></> : <>Training data<br /><em>needs another run</em></>}</h1>
+      <h1 id="result-title">{passed ? <>Library core<br /><em>fully restored!</em></> : <>Training data<br /><em>needs another run</em></>}</h1>
       <p className="screen-copy">{passed ? 'KnowsMore restored the search system and Ralph cleared the integrity feed. Full arcade run complete.' : 'Both levels are complete. Review the system feedback, then return for a stronger combined score.'}</p>
 
       <ArcadeFrame className="result-dashboard result-dashboard--run" tone={passed ? 'gold' : 'red'}>
