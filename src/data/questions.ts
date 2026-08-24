@@ -161,20 +161,5 @@ export const questions: Question[] = [
     topic: 'LIBRARY RULES',
     difficulty: 'FOUNDATION',
   },
-  {
-    id: 'research-consultation',
-    corruptedTerm: '_ E _ _ _ _ _ _   C O N _ _ _ _ A T I O N',
-    restoredTerm: 'RESEARCH CONSULTATION',
-    systemPrompt: 'One-on-one help session available.',
-    contextClue: 'A library service where students get help finding sources and doing research.',
-    suggestions: [
-      { term: 'RESEARCH CONSULTATION', descriptor: 'One-on-one research help' },
-      { term: 'RESOURCE CONSERVATION', descriptor: 'Protecting natural environments' },
-      { term: 'PERSONAL CONVERSATION', descriptor: 'Private dialogue between people' },
-      { term: 'NEGATIVE CONFIRMATION', descriptor: 'Response indicating a lack of something' },
-    ],
-    explanation: 'Research consultation gives students one-on-one help with sources, search strategies, and topic refinement.',
-    topic: 'RESEARCH SUPPORT',
-    difficulty: 'APPLIED',
-  },
+
 ]
