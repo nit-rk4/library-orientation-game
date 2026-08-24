@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useArcadeAudio } from '../audio/ArcadeAudioContext'
 import { ArcadeFrame, ArcadeLink, PixelBadge, PixelIcon } from '../components/ArcadeElements'
-import { Button } from '../components/Button'
 import { Leaderboard } from '../components/Leaderboard'
 import type { PlayerProfile } from '../types/game'
 import type { LeaderboardEntry, LeaderboardLoadStatus, ScoreSubmissionStatus } from '../types/leaderboard'
@@ -17,11 +16,19 @@ interface ResultScreenProps {
   entries: LeaderboardEntry[]
   leaderboardStatus: LeaderboardLoadStatus
   submissionStatus: ScoreSubmissionStatus
-  onRetry: () => void
-  onSubmit: () => void
 }
 
-export function ResultScreen({ player, knowsMoreCorrect, knowsMorePoints, ralphCorrect, ralphPoints, bestStreak, entries, leaderboardStatus, submissionStatus, onRetry, onSubmit }: ResultScreenProps) {
+export function ResultScreen({
+  player,
+  knowsMoreCorrect,
+  knowsMorePoints,
+  ralphCorrect,
+  ralphPoints,
+  bestStreak,
+  entries,
+  leaderboardStatus,
+  submissionStatus,
+}: ResultScreenProps) {
   const correctAnswers = knowsMoreCorrect + ralphCorrect
   const arcadePoints = knowsMorePoints + ralphPoints
   const passed = correctAnswers >= 14
@@ -48,18 +55,16 @@ export function ResultScreen({ player, knowsMoreCorrect, knowsMorePoints, ralphC
         <div className="result-dashboard__stat"><span>KNOWSMORE</span><strong>{formatPoints(knowsMorePoints)}</strong><small>{knowsMoreCorrect}/10 CORRECT</small></div>
         <div className="result-dashboard__stat"><span>RALPH</span><strong>{formatPoints(ralphPoints)}</strong><small>{ralphCorrect}/10 CORRECT</small></div>
         <div className="result-dashboard__stat"><span>COMBINED SCORE</span><strong>{formatPoints(arcadePoints)}</strong></div>
-        <div className="result-dashboard__stat"><span>BEST COMBO</span><strong>×{bestStreak}</strong></div>
+        <div className="result-dashboard__stat"><span>BEST COMBO</span><strong>{'\u00D7'}{bestStreak}</strong></div>
       </ArcadeFrame>
 
       <div className="result-actions">
-        {submissionStatus === 'idle' && <Button onClick={onSubmit} sound="success">Save full-run score</Button>}
-        {submissionStatus === 'saving' && <Button disabled sound={false}>Syncing score...</Button>}
+        {submissionStatus === 'saving' && <div className="submission-confirmed" role="status"><PixelIcon name="coin" /> SYNCING SCORE...</div>}
         {submissionStatus === 'saved' && <div className="submission-confirmed" role="status"><PixelIcon name="coin" /> COMBINED SCORE SAVED!</div>}
-        {submissionStatus === 'error' && <div className="submission-confirmed submission-confirmed--error" role="alert">SYNC FAILED — SCORE NOT SAVED <button onClick={onSubmit} type="button">TRY AGAIN</button></div>}
-        <Button disabled={submissionStatus === 'saving'} onClick={onRetry} variant="secondary">Retry full run</Button>
+        {submissionStatus === 'error' && <div className="submission-confirmed submission-confirmed--error" role="alert">SYNC FAILED {'\u2014'} SCORE NOT SAVED</div>}
       </div>
       <Leaderboard entries={entries} status={leaderboardStatus} />
-      <ArcadeLink className="text-link result-home" href="#/">◀ ARCADE HOME</ArcadeLink>
+      <ArcadeLink className="text-link result-home" href="#/">{'\u25C0'} ARCADE HOME</ArcadeLink>
     </section>
   )
 }

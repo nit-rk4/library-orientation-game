@@ -141,15 +141,11 @@ export function KnowsMoreGame() {
   function advanceRalph() {
     if (ralphQuestion === runRalphQuestions.length - 1) {
       setScreen('result')
+      void submitScore()
       return
     }
     setRalphQuestion((current) => current + 1)
     setRalphFeedback(null)
-  }
-
-  function retryRun() {
-    resetRun()
-    setScreen('knowsmore')
   }
 
   async function submitScore() {
@@ -209,8 +205,6 @@ export function KnowsMoreGame() {
           knowsMoreCorrect={knowsMoreCorrect}
           knowsMorePoints={knowsMorePoints}
           leaderboardStatus={leaderboardStatus}
-          onRetry={retryRun}
-          onSubmit={submitScore}
           player={player}
           ralphCorrect={ralphCorrect}
           ralphPoints={ralphPoints}
