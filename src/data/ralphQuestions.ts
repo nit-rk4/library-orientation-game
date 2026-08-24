@@ -30,13 +30,6 @@ export const ralphQuestions: RalphQuestion[] = [
     topic: 'OPAC',
   },
   {
-    id: 'ebooks',
-    statement: 'An e-book is a book that can be read electronically using a computer, tablet, or phone.',
-    isTrue: true,
-    explanation: 'E-books are digital versions of books that can be accessed through electronic devices.',
-    topic: 'E-BOOKS',
-  },
-  {
     id: 'databases-entertainment',
     statement: 'Library databases are useful only for entertainment and social media.',
     isTrue: false,
@@ -73,37 +66,9 @@ export const ralphQuestions: RalphQuestion[] = [
   },
   {
     id: 'password-sharing',
-    statement: 'You should share your library account password with friends so they can access resources.',
+    statement: 'You should share your  account password with friends so they can access resources.',
     isTrue: false,
     explanation: 'Your library account and password should be kept private to protect your personal information.',
     topic: 'ACCOUNT SECURITY',
-  },
-  {
-    id: 'logout-public-computer',
-    statement: 'Logging out of your library account on a public computer helps keep your account secure.',
-    isTrue: true,
-    explanation: 'Logging out prevents other people from accessing your account after you leave.',
-    topic: 'ACCOUNT SECURITY',
-  },
-  {
-    id: 'all-websites-reliable',
-    statement: 'Every website you find through an internet search is automatically reliable for academic research.',
-    isTrue: false,
-    explanation: 'You should evaluate a source’s author, accuracy, date, purpose, and credibility before using it.',
-    topic: 'RESEARCH SUPPORT',
-  },
-  {
-    id: 'publication-date',
-    statement: 'Checking when an article was published can help you decide whether the information is current.',
-    isTrue: true,
-    explanation: 'Publication dates are important when your research requires recent or updated information.',
-    topic: 'RESEARCH SUPPORT',
-  },
-  {
-    id: 'librarian-research-help',
-    statement: 'Asking a librarian for research help means you are doing your assignment incorrectly.',
-    isTrue: false,
-    explanation: 'Asking for research assistance is a smart way to learn how to find and use good information.',
-    topic: 'RESEARCH SUPPORT',
   },
 ]

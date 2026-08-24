@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useArcadeAudio } from '../audio/ArcadeAudioContext'
 import { PixelBadge, PixelIcon } from '../components/ArcadeElements'
-import { Button } from '../components/Button'
+import { AnswerFeedbackOverlay } from '../components/AnswerFeedbackOverlay'
 import { QuestionCard } from '../components/QuestionCard'
 import { ScoreDisplay } from '../components/ScoreDisplay'
 import { Timer } from '../components/Timer'
 import type { AnswerFeedback, Question, QuestionPhase } from '../types/game'
-import { formatPoints } from '../utils/format'
 
 interface GameScreenProps {
   question: Question
@@ -55,15 +54,20 @@ export function GameScreen({
   }, [])
 
   const resolveQuery = useCallback((term: string | null, timedOut: boolean, seconds: number) => {
-    if (phase !== 'active') return
+    if (phase !== 'active' || feedback) return
     setPhase('resolving')
     resolutionTimer.current = window.setTimeout(() => onAnswer(term, timedOut, seconds), 600)
-  }, [onAnswer, phase])
+  }, [feedback, onAnswer, phase])
+
+  const selectSuggestion = useCallback((term: string) => {
+    setSelectedTerm(term)
+    resolveQuery(term, false, timeRemaining)
+  }, [resolveQuery, timeRemaining])
 
   const feedbackHeading = feedback?.isCorrect
-    ? 'WORD RESTORED!'
+    ? 'MISSING WORD RESTORED'
     : feedback?.timedOut
-      ? 'TIME OVER!'
+      ? 'SEARCH WINDOW EXPIRED'
       : 'SEARCH MISS!'
   const feedbackCopy = feedback?.isCorrect
     ? 'Tama ang restored entry. Database match confirmed.'
@@ -92,34 +96,28 @@ export function GameScreen({
         duration={15}
         onExpire={() => resolveQuery(null, true, 0)}
         onTimeChange={setTimeRemaining}
-        paused={phase !== 'active'}
+        paused={phase !== 'active' || Boolean(feedback)}
       />
       <QuestionCard
         feedback={feedback}
-        onExecute={() => resolveQuery(selectedTerm, false, timeRemaining)}
-        onSelect={setSelectedTerm}
-        phase={phase}
+        onSelect={selectSuggestion}
+        phase={feedback ? 'feedback' : phase}
         question={question}
         selectedTerm={selectedTerm}
       />
 
       {feedback && (
-        <div className={`feedback-panel${feedback.isCorrect ? ' feedback-panel--success' : ' feedback-panel--error'}`} aria-live="assertive">
-          <div className="feedback-panel__burst" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
-          <div>
-            <p className="eyebrow">{feedbackHeading}</p>
-            <h2>{feedbackCopy}</h2>
-            <p>{question.explanation}</p>
-            <div className="feedback-panel__telemetry">
-              <span>+{formatPoints(feedback.pointsAwarded)} PTS</span>
-              <span>{feedback.timeRemaining}s LEFT</span>
-              <span>COMBO ×{feedback.streak}</span>
-            </div>
-          </div>
-          <Button onClick={onAdvance} variant={feedback.isCorrect ? 'primary' : 'secondary'}>
-            {questionNumber === totalQuestions ? 'Open system report' : 'Load next query'}
-          </Button>
-        </div>
+        <AnswerFeedbackOverlay
+          explanation={question.explanation}
+          heading={feedbackHeading}
+          onComplete={onAdvance}
+          pointsAwarded={feedback.pointsAwarded}
+          streak={feedback.streak}
+          summary={feedbackCopy}
+          theme="knowsmore"
+          timeRemaining={feedback.timeRemaining}
+          tone={feedback.isCorrect ? 'success' : feedback.timedOut ? 'timeout' : 'error'}
+        />
       )}
     </section>
   )

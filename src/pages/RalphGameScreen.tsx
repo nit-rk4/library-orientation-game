@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useArcadeAudio } from '../audio/ArcadeAudioContext'
 import { PixelBadge, PixelIcon } from '../components/ArcadeElements'
-import { Button } from '../components/Button'
+import { AnswerFeedbackOverlay } from '../components/AnswerFeedbackOverlay'
 import { ScoreDisplay } from '../components/ScoreDisplay'
 import { Timer } from '../components/Timer'
 import type { QuestionPhase, RalphAnswerFeedback, RalphQuestion } from '../types/game'
-import { formatPoints } from '../utils/format'
 
 interface RalphGameScreenProps {
   question: RalphQuestion
@@ -55,11 +54,11 @@ export function RalphGameScreen({
   }, [])
 
   const resolveSignal = useCallback((answer: boolean | null, timedOut: boolean, seconds: number) => {
-    if (phase !== 'active') return
+    if (phase !== 'active' || feedback) return
     setPhase('resolving')
     play('execute')
     resolutionTimer.current = window.setTimeout(() => onAnswer(answer, timedOut, seconds), 500)
-  }, [onAnswer, phase, play])
+  }, [feedback, onAnswer, phase, play])
 
   const repairStatus = feedback
     ? feedback.isCorrect
@@ -119,7 +118,7 @@ export function RalphGameScreen({
               {Array.from({ length: totalQuestions }, (_, index) => <i className={index < levelCorrectAnswers ? 'is-online' : ''} key={index} />)}
             </div>
           </div>
-          <Timer duration={15} label="REPAIR WINDOW" onExpire={() => resolveSignal(null, true, 0)} onTimeChange={setTimeRemaining} paused={phase !== 'active'} />
+          <Timer duration={15} label="REPAIR WINDOW" onExpire={() => resolveSignal(null, true, 0)} onTimeChange={setTimeRemaining} paused={phase !== 'active' || Boolean(feedback)} />
         </div>
         <div className="ralph-hazard-rail ralph-hazard-rail--bottom" aria-hidden="true" />
       </div>
@@ -145,14 +144,14 @@ export function RalphGameScreen({
         </div>
         <p className="ralph-card__instruction">Verified information gets saved. False information gets smashed.</p>
         <div className="ralph-controls" aria-label="Choose whether the statement is true or false">
-          <button className="ralph-choice ralph-choice--save" disabled={phase !== 'active'} onClick={() => resolveSignal(true, false, timeRemaining)} type="button">
+          <button className="ralph-choice ralph-choice--save" disabled={phase !== 'active' || Boolean(feedback)} onClick={() => resolveSignal(true, false, timeRemaining)} type="button">
             <span className="ralph-choice__signal">TRUE SIGNAL</span>
             <strong>SAVE IT</strong>
             <small>STABILIZE // VERIFY</small>
             <span className="ralph-choice__tool-mark" aria-hidden="true" />
             <i aria-hidden="true">A</i>
           </button>
-          <button className="ralph-choice ralph-choice--smash" disabled={phase !== 'active'} onClick={() => resolveSignal(false, false, timeRemaining)} type="button">
+          <button className="ralph-choice ralph-choice--smash" disabled={phase !== 'active' || Boolean(feedback)} onClick={() => resolveSignal(false, false, timeRemaining)} type="button">
             <span className="ralph-choice__signal">FALSE SIGNAL</span>
             <strong>SMASH IT</strong>
             <small>PURGE // DESTROY</small>
@@ -161,32 +160,28 @@ export function RalphGameScreen({
           </button>
         </div>
 
-        {(phase === 'scanning' || phase === 'resolving') && (
+        {!feedback && (phase === 'scanning' || phase === 'resolving') && (
           <div className="scan-overlay scan-overlay--ralph" aria-live="polite">
             <PixelIcon name="brick" /><span />
             <small>MODULE 02 // SIGNAL {String(questionNumber).padStart(2, '0')}</small>
-            {phase === 'scanning' ? 'READING INTEGRITY DATA…' : 'APPLYING SYSTEM PATCH…'}
+            {phase === 'scanning' ? 'READING INTEGRITY DATA...' : 'APPLYING SYSTEM PATCH...'}
           </div>
         )}
       </article>
 
       {feedback && (
-        <div className={`feedback-panel feedback-panel--ralph${feedback.isCorrect ? ` feedback-panel--success${feedback.selectedAnswer === true ? ' ralph-feedback--save' : ' ralph-feedback--smash'}` : ' feedback-panel--error'}`} aria-live="assertive">
-          <div className="feedback-panel__burst ralph-feedback__debris" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
-          <div>
-            <p className="eyebrow">{feedbackHeading}</p>
-            <h2>{feedbackCopy}</h2>
-            <p>{question.explanation}</p>
-            <div className="feedback-panel__telemetry">
-              <span>+{formatPoints(feedback.pointsAwarded)} PTS</span>
-              <span>{feedback.timeRemaining}s LEFT</span>
-              <span>COMBO ×{feedback.streak}</span>
-            </div>
-          </div>
-          <Button onClick={onAdvance} variant={feedback.isCorrect ? 'primary' : 'secondary'}>
-            {questionNumber === totalQuestions ? 'Restore library core' : 'Scan next signal'}
-          </Button>
-        </div>
+        <AnswerFeedbackOverlay
+          action={feedback.isCorrect ? feedback.selectedAnswer === true ? 'save' : 'smash' : undefined}
+          explanation={question.explanation}
+          heading={feedbackHeading}
+          onComplete={onAdvance}
+          pointsAwarded={feedback.pointsAwarded}
+          streak={feedback.streak}
+          summary={feedbackCopy}
+          theme="ralph"
+          timeRemaining={feedback.timeRemaining}
+          tone={feedback.isCorrect ? 'success' : feedback.timedOut ? 'timeout' : 'error'}
+        />
       )}
     </section>
   )

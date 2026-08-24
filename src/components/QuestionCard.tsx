@@ -1,7 +1,6 @@
 import { useArcadeAudio } from '../audio/ArcadeAudioContext'
 import type { AnswerFeedback, Question, QuestionPhase } from '../types/game'
 import { PixelBadge, PixelIcon } from './ArcadeElements'
-import { Button } from './Button'
 
 interface QuestionCardProps {
   question: Question
@@ -9,18 +8,12 @@ interface QuestionCardProps {
   selectedTerm: string | null
   feedback: AnswerFeedback | null
   onSelect: (term: string) => void
-  onExecute: () => void
 }
 
-export function QuestionCard({ question, phase, selectedTerm, feedback, onSelect, onExecute }: QuestionCardProps) {
+export function QuestionCard({ question, phase, selectedTerm, feedback, onSelect }: QuestionCardProps) {
   const isLocked = phase !== 'active'
   const displayedTerm = feedback ? question.restoredTerm : question.corruptedTerm
   const { play } = useArcadeAudio()
-
-  function executeSearch() {
-    play('execute')
-    onExecute()
-  }
 
   return (
     <article className={`question-card question-card--${phase}${feedback ? feedback.isCorrect ? ' is-success' : feedback.timedOut ? ' is-timeout' : ' is-error' : ''}`}>
@@ -42,9 +35,7 @@ export function QuestionCard({ question, phase, selectedTerm, feedback, onSelect
         <h2>{question.contextClue}</h2>
       </div>
 
-      <div className="search-console" role="search" onKeyDown={(event) => {
-        if (event.key === 'Enter' && selectedTerm && phase === 'active') executeSearch()
-      }}>
+      <div className="search-console" role="search">
         <label htmlFor={`query-${question.id}`}><PixelIcon name="search" /> SEARCH BAR</label>
         <div className="search-console__input">
           <span aria-hidden="true">▶</span>
@@ -64,7 +55,7 @@ export function QuestionCard({ question, phase, selectedTerm, feedback, onSelect
               className={`search-suggestion${isSelected ? ' is-selected' : ''}${isCorrect ? ' is-correct' : ''}${isWrong ? ' is-wrong' : ''}`}
               disabled={isLocked}
               key={suggestion.term}
-              onClick={() => { play('select'); onSelect(suggestion.term) }}
+              onClick={() => { play('select'); play('execute'); onSelect(suggestion.term) }}
               role="option"
               type="button"
             >
@@ -76,8 +67,6 @@ export function QuestionCard({ question, phase, selectedTerm, feedback, onSelect
           )
         })}
       </div>
-
-      <Button disabled={!selectedTerm || phase !== 'active'} fullWidth onClick={onExecute} sound="execute">Run search</Button>
 
       {(phase === 'scanning' || phase === 'resolving') && (
         <div className="scan-overlay" aria-live="polite">
